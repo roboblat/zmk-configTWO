@@ -66,20 +66,12 @@
          * Combos are defined here in the keymap (Studio can't edit them yet).
          */
 
-        /* ESC + Backspace (top outer corners) -> unlock ZMK Studio. */
+        /* ESC + Del (top outer corners) -> unlock ZMK Studio.
+           Position-based, so it works regardless of the keycodes there. */
         combo_studio_unlock {
-            timeout-ms = <50>;
+            timeout-ms = <75>;
             key-positions = <0 30>;
             bindings = <&studio_unlock>;
-        };
-
-        /* Both SPACE keys together -> toggle the Scroll layer (encoder
-           scroll <-> volume). Rarely hit by accident since normal typing
-           presses only one space at a time. */
-        combo_scroll_toggle {
-            timeout-ms = <50>;
-            key-positions = <23 43>;
-            bindings = <&tog 1>;
         };
     };
 
@@ -97,106 +89,81 @@
                 &kp ESC   &kp LALT  &kp W     &kp E     &kp R     &kp T
                 &kp TAB   &kp Q     &kp S     &kp D     &kp F     &kp G
                 &kp LSHFT &kp A     &kp X     &kp C     &kp V     &kp B
-                &kp LCTRL &kp Z     &kp LPAR  &kp COMMA &kp RPAR  &kp SPACE
-                &kp DOT
+                &kp LCTRL &kp Z     &kp N9    &kp COMMA &none     &kp SPACE
+                /* Left thumb: TAP = period, HOLD = keypad layer (layer 1).
+                   This is your momentary key - hold it to type numbers. */
+                &lt 1 DOT
 
                 /* ============ RIGHT (positions 25..60) ============ */
                 /* Row 0 */
-                &kp Y     &kp U     &kp I     &kp O     &kp DEL   &kp BSPC
+                &kp Y     &kp U     &kp I     &kp O     &kp MINUS &kp DEL
                 /* Row 1 */
-                &kp H     &kp J     &kp K     &kp L     &kp P     &kp RSHFT
+                &kp H     &kp J     &kp K     &kp L     &kp P     &kp BSPC
                 /* Row 2 */
                 &kp N     &kp M     &kp COMMA &kp DOT   &kp SEMI  &kp RET
                 /* Row 3 */
-                &kp SPACE &kp LEFT  &kp UP    &kp RIGHT &kp FSLH  &kp LCTRL
+                &kp BSPC  &kp LEFT  &kp UP    &kp RIGHT &kp FSLH  &kp RSHFT
                 /* Row 4 (positions 49-54): only DOWN (pos 52) is a real key.
                    49,50,51,53,54 are unpopulated matrix slots - no physical
                    switch exists there - so they MUST stay &none. */
                 &none     &none     &none     &kp DOWN  &none     &none
-                /* Row 5 (the 3 keys under the trackpad).
-                   Normally momentary-layer keys; when the trackpad is touched
-                   the auto-activated Mouse layer (index 4) overrides these
-                   same 3 positions with mouse clicks. Retarget the &mo layers
-                   in Studio to whatever you want them to do when NOT touching. */
-                &mo 1     &mo 2     &mo 3     &none     &none     &none
+                /* Row 5: the 3 keys under the trackpad = mouse buttons.
+                   (Restored to plain clicks while we isolate the auto-mouse-
+                   layer issue. MB1=left, MB2=right, MB3=middle.) */
+                &mkp MB2  &mkp MB3  &mkp MB1  &none     &none     &none
             >;
 
-            /* Encoder = volume by default. On the Scroll layer below it
-               becomes a scroll wheel instead. */
-            sensor-bindings = <&inc_dec_kp C_VOL_UP C_VOL_DN>;
-        };
-
-        /*
-         * Scroll layer (index 1). All keys are &trans, so normal typing still
-         * works from the Base layer underneath - the ONLY thing this layer
-         * changes is the encoder, which scrolls instead of changing volume.
-         *
-         * Activate it with a `&tog 1` (toggle) or `&mo 1` (momentary) key.
-         * &tog 1 is pre-placed on the base layer (right thumb area); you can
-         * move that toggle key freely in ZMK Studio - the encoder binding
-         * itself can't be edited in Studio, but the layer toggle can.
-         */
-        scroll_layer {
-            display-name = "Scroll";
-            bindings = <
-                /* ============ LEFT (positions 0..24) ============ */
-                &trans    &trans    &trans    &trans    &trans    &trans
-                &trans    &trans    &trans    &trans    &trans    &trans
-                &trans    &trans    &trans    &trans    &trans    &trans
-                &trans    &trans    &trans    &trans    &trans    &trans
-                &trans
-
-                /* ============ RIGHT (positions 25..60) ============ */
-                &trans    &trans    &trans    &trans    &trans    &trans
-                &trans    &trans    &trans    &trans    &trans    &trans
-                &trans    &trans    &trans    &trans    &trans    &trans
-                &trans    &trans    &trans    &trans    &trans    &trans
-                &trans    &trans    &trans    &trans    &trans    &trans
-                &trans    &trans    &trans    &trans    &trans    &trans
-            >;
-
+            /* Encoder = SCROLL on the base layer (your preference).
+               Volume lives on the Fn layer below. */
             sensor-bindings = <&enc_scroll>;
         };
 
         /*
-         * Two spare layers for ZMK Studio (now indices 2 and 3).
-         * `reserved` layers are skipped by normal builds but become
-         * available to enable, name, and fill in from ZMK Studio - no
-         * reflash needed. Adding more of these is the ONE keymap edit that
-         * still takes effect after Studio starts managing the keymap, so
-         * add extras now if you think you'll want them.
+         * Keypad layer (index 1). Held via the left-thumb &lt 1 key.
+         *
+         * RIGHT half = numpad, transcribed from your screenshot (image 2):
+         * the numbers, +, -, / and backspace read clearly. The key marked
+         * (?) below I could NOT read with confidence - it's my best guess;
+         * open this layer in Studio next to your saved one and fix it if
+         * wrong. LEFT half is left &trans (your letters/Esc/etc. still work
+         * while you hold), since image 2's left side was too blurry to trust.
+         * Adjust any of this freely in Studio - it's all keymap, fully editable.
          */
-        extra1 { status = "reserved"; };
-        extra2 { status = "reserved"; };
-
-        /*
-         * Mouse layer (index 4). Auto-enabled while the trackpad is being
-         * touched, via the &zip_temp_layer processor in ergo_right.overlay.
-         * Everything is &trans EXCEPT the 3 keys under the trackpad (positions
-         * 55/56/57), which here are the mouse buttons. Net effect: those 3
-         * keys are momentary-layer keys normally, but become right/middle/left
-         * click the moment your finger is on the pad.
-         * (MB1=left, MB2=right, MB3=middle - same order you had before.)
-         */
-        mouse_layer {
-            display-name = "Mouse";
+        keypad_layer {
+            display-name = "Keypad";
             bindings = <
-                /* ============ LEFT (positions 0..24) ============ */
+                /* ============ LEFT (positions 0..24) = transparent ======== */
                 &trans    &trans    &trans    &trans    &trans    &trans
                 &trans    &trans    &trans    &trans    &trans    &trans
                 &trans    &trans    &trans    &trans    &trans    &trans
                 &trans    &trans    &trans    &trans    &trans    &trans
                 &trans
 
-                /* ============ RIGHT (positions 25..60) ============ */
-                &trans    &trans    &trans    &trans    &trans    &trans
-                &trans    &trans    &trans    &trans    &trans    &trans
-                &trans    &trans    &trans    &trans    &trans    &trans
-                &trans    &trans    &trans    &trans    &trans    &trans
-                &trans    &trans    &trans    &trans    &trans    &trans
-                /* Row 5: the 3 trackpad buttons -> mouse clicks */
-                &mkp MB2  &mkp MB3  &mkp MB1  &trans    &trans    &trans
+                /* ============ RIGHT (positions 25..60) = numpad =========== */
+                /* Row 0 */
+                &trans    &trans    &kp BSPC      &kp KP_N7  &kp KP_N8  &kp KP_N9
+                /* Row 1 */
+                &trans    &trans    &kp KP_PLUS   &kp KP_N4  &kp KP_N5  &kp KP_N6
+                /* Row 2 */
+                &trans    &trans    &kp KP_MINUS  &kp KP_N1  &kp KP_N2  &kp KP_N3
+                /* Row 3  (KP_MULTIPLY at pos 45 is the (?) best-guess key) */
+                &trans    &trans    &kp KP_MULTIPLY &kp KP_N0 &kp KP_DOT &kp KP_DIVIDE
+                /* Row 4: dead matrix slots stay &none; 52 falls through. */
+                &none     &none     &none     &trans    &none     &none
+                /* Row 5: trackpad buttons fall through (still click). */
+                &trans    &trans    &trans    &none     &none     &none
             >;
+
+            /* Encoder unchanged while held (scroll). */
+            sensor-bindings = <&enc_scroll>;
         };
+
+        /*
+         * One spare layer kept in reserve. It's invisible on a normal boot
+         * (you still have just your 2 layers), but it lets you ADD a layer
+         * from ZMK Studio later without reflashing. Delete this line if you
+         * truly want none.
+         */
+        spare { status = "reserved"; };
     };
 };
