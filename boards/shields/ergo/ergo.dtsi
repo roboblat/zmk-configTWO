@@ -12,6 +12,7 @@
  */
 
 #include <dt-bindings/zmk/matrix_transform.h>
+#include "ergo-layouts.dtsi"
 
 &pinctrl {
     i2c0_default: i2c0_default {
@@ -40,7 +41,12 @@
 
 / {
     chosen {
-        zmk,matrix-transform = &default_transform;
+        /*
+         * ZMK Studio requires a chosen zmk,physical-layout (and NO chosen
+         * zmk,matrix-transform). The transform is attached to the layout
+         * below instead; the layout's `keys` live in ergo-layouts.dtsi.
+         */
+        zmk,physical-layout = &ergo_physical_layout;
     };
 
     default_transform: keymap_transform_0 {
@@ -85,4 +91,14 @@
         sensors = <&encoder0>;
         triggers-per-rotation = <20>;
     };
+};
+
+/*
+ * Give the Studio physical layout (defined in ergo-layouts.dtsi) its matrix
+ * transform. kscan is intentionally left to each half's `chosen zmk,kscan`
+ * (set per-overlay), since the two halves scan different pins. The right
+ * overlay still applies `col-offset = <5>` to &default_transform as before.
+ */
+&ergo_physical_layout {
+    transform = <&default_transform>;
 };
