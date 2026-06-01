@@ -8,6 +8,7 @@
         compatible = "zmk,keymap";
 
         default_layer {
+            display-name = "Base";
             /*
              * Bindings follow the combined transform in ergo.dtsi:
              * first the 25 LEFT positions, then the 36 RIGHT positions.
@@ -30,7 +31,10 @@
                 /* Row 3 */
                 &kp SPACE &kp LEFT  &kp UP    &kp RIGHT &kp FSLH  &kp LCTRL
                 /* Row 4 */
-                &none     &none     &none     &kp DOWN  &none     &none
+                /* First key (pos 49) is the ZMK Studio unlock; it was &none.
+                   Studio is read-only until this is pressed. Move it wherever
+                   you like - any key position works. */
+                &studio_unlock  &none     &none     &kp DOWN  &none     &none
                 /* Row 5 (trackpad buttons) */
                 &mkp MB2  &mkp MB3  &mkp MB1  &none     &none     &none
             >;
