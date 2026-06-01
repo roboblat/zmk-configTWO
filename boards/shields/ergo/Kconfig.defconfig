@@ -7,7 +7,7 @@ if SHIELD_ERGO_RIGHT
 
 config ZMK_KEYBOARD_NAME
     # Must be <= 16 characters.
-    default "Ergo"
+    default "SquatchBox"
 
 config ZMK_SPLIT_ROLE_CENTRAL
     default y
