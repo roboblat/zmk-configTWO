@@ -113,8 +113,12 @@
                    49,50,51,53,54 are unpopulated matrix slots - no physical
                    switch exists there - so they MUST stay &none. */
                 &none     &none     &none     &kp DOWN  &none     &none
-                /* Row 5 (trackpad buttons) */
-                &mkp MB2  &mkp MB3  &mkp MB1  &none     &none     &none
+                /* Row 5 (the 3 keys under the trackpad).
+                   Normally momentary-layer keys; when the trackpad is touched
+                   the auto-activated Mouse layer (index 4) overrides these
+                   same 3 positions with mouse clicks. Retarget the &mo layers
+                   in Studio to whatever you want them to do when NOT touching. */
+                &mo 1     &mo 2     &mo 3     &none     &none     &none
             >;
 
             /* Encoder = volume by default. On the Scroll layer below it
@@ -164,5 +168,35 @@
          */
         extra1 { status = "reserved"; };
         extra2 { status = "reserved"; };
+
+        /*
+         * Mouse layer (index 4). Auto-enabled while the trackpad is being
+         * touched, via the &zip_temp_layer processor in ergo_right.overlay.
+         * Everything is &trans EXCEPT the 3 keys under the trackpad (positions
+         * 55/56/57), which here are the mouse buttons. Net effect: those 3
+         * keys are momentary-layer keys normally, but become right/middle/left
+         * click the moment your finger is on the pad.
+         * (MB1=left, MB2=right, MB3=middle - same order you had before.)
+         */
+        mouse_layer {
+            display-name = "Mouse";
+            bindings = <
+                /* ============ LEFT (positions 0..24) ============ */
+                &trans    &trans    &trans    &trans    &trans    &trans
+                &trans    &trans    &trans    &trans    &trans    &trans
+                &trans    &trans    &trans    &trans    &trans    &trans
+                &trans    &trans    &trans    &trans    &trans    &trans
+                &trans
+
+                /* ============ RIGHT (positions 25..60) ============ */
+                &trans    &trans    &trans    &trans    &trans    &trans
+                &trans    &trans    &trans    &trans    &trans    &trans
+                &trans    &trans    &trans    &trans    &trans    &trans
+                &trans    &trans    &trans    &trans    &trans    &trans
+                &trans    &trans    &trans    &trans    &trans    &trans
+                /* Row 5: the 3 trackpad buttons -> mouse clicks */
+                &mkp MB2  &mkp MB3  &mkp MB1  &trans    &trans    &trans
+            >;
+        };
     };
 };
