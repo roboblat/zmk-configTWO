@@ -9,6 +9,7 @@
 #include <zephyr/dt-bindings/pinctrl/nrf-pinctrl.h>
 #include <zephyr/dt-bindings/input/input-event-codes.h>
 #include <dt-bindings/zmk/input_transform.h>
+#include <input/processors.dtsi>   /* zip_xy_scaler / zip_scroll_scaler */
 #include "ergo.dtsi"
 
 /* Shift this half into logical columns 5..10. */
@@ -33,7 +34,18 @@
         /* reset-gpios intentionally omitted: gpio0 2 is the encoder A pin
            (encoder is defined in the shared ergo.dtsi). The IQS5xx resets
            itself on power-up, so an explicit reset line isn't required. */
-        scroll; /* two-finger scroll */
+
+        /* ---- All gestures this driver supports ---- */
+        one-finger-tap;              /* tap            -> left click  */
+        two-finger-tap;              /* two-finger tap -> right click */
+        press-and-hold;              /* hold + move    -> click & drag */
+        press-and-hold-time = <250>; /* +ms over tap time to engage drag */
+        scroll;                      /* two-finger vertical + horizontal scroll */
+        /* (This driver has no pinch/zoom, 3-finger, or swipe gestures.) */
+
+        /* ---- Feel tuning (not raw speed - that's the scaler below) ---- */
+        stationary-threshold = <5>;  /* px a finger must move to count; raise to kill jitter */
+        bottom-beta = <5>;           /* 0 = smoothest/laggiest ... 255 = snappiest/jitteriest */
     };
 };
 
@@ -87,8 +99,19 @@
     trackpad_listener {
         compatible = "zmk,input-listener";
         device = <&tps43>;
+        /*
+         * Sensitivity = the scalers, given as <multiplier divisor>:
+         *   <&zip_xy_scaler 1 1>  -> 1.0x (no change, current feel)
+         *   <&zip_xy_scaler 3 2>  -> 1.5x faster cursor
+         *   <&zip_xy_scaler 1 2>  -> 0.5x slower cursor
+         * zip_scroll_scaler does the same for scroll speed. Edit the two
+         * numbers to taste, rebuild, reflash. (None of this is editable in
+         * ZMK Studio - it's all firmware.)
+         */
         input-processors =
             <&trackpad_transform (INPUT_TRANSFORM_XY_SWAP | INPUT_TRANSFORM_X_INVERT)>,
-            <&trackpad_scroll_transform (INPUT_TRANSFORM_XY_SWAP | INPUT_TRANSFORM_Y_INVERT)>;
+            <&zip_xy_scaler 1 1>,
+            <&trackpad_scroll_transform (INPUT_TRANSFORM_XY_SWAP | INPUT_TRANSFORM_Y_INVERT)>,
+            <&zip_scroll_scaler 1 1>;
     };
 };
