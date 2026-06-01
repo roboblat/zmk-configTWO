@@ -42,5 +42,16 @@
             /* Encoder lives on the left half; events arrive over the split link. */
             sensor-bindings = <&inc_dec_kp C_VOL_UP C_VOL_DN>;
         };
+
+        /*
+         * Two spare layers for ZMK Studio (3 layers total).
+         * `reserved` layers are skipped by normal builds but become
+         * available to enable, name, and fill in from ZMK Studio - no
+         * reflash needed. Adding more of these is the ONE keymap edit that
+         * still takes effect after Studio starts managing the keymap, so
+         * add extras now if you think you'll want them.
+         */
+        extra1 { status = "reserved"; };
+        extra2 { status = "reserved"; };
     };
 };
