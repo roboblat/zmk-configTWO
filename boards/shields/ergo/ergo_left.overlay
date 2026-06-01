@@ -18,6 +18,12 @@
     };
 };
 
+/* Encoder hardware is on THIS (left/peripheral) half - enable it here.
+   The shared sensors node relays rotation to the central. */
+&encoder0 {
+    status = "okay";
+};
+
 / {
     chosen {
         zmk,kscan = &kscan0;
