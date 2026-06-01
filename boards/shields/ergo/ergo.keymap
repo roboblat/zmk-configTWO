@@ -56,6 +56,33 @@
         };
     };
 
+    combos {
+        compatible = "zmk,combos";
+
+        /*
+         * Your board has no spare keys (all 53 switches are assigned), so
+         * these actions are chords instead of dedicated keys. A combo fires
+         * when its key-positions are pressed together within timeout-ms.
+         * Combos are defined here in the keymap (Studio can't edit them yet).
+         */
+
+        /* ESC + Backspace (top outer corners) -> unlock ZMK Studio. */
+        combo_studio_unlock {
+            timeout-ms = <50>;
+            key-positions = <0 30>;
+            bindings = <&studio_unlock>;
+        };
+
+        /* Both SPACE keys together -> toggle the Scroll layer (encoder
+           scroll <-> volume). Rarely hit by accident since normal typing
+           presses only one space at a time. */
+        combo_scroll_toggle {
+            timeout-ms = <50>;
+            key-positions = <23 43>;
+            bindings = <&tog 1>;
+        };
+    };
+
     keymap {
         compatible = "zmk,keymap";
 
@@ -82,10 +109,10 @@
                 &kp N     &kp M     &kp COMMA &kp DOT   &kp SEMI  &kp RET
                 /* Row 3 */
                 &kp SPACE &kp LEFT  &kp UP    &kp RIGHT &kp FSLH  &kp LCTRL
-                /* Row 4 */
-                /* pos 49 = Studio unlock; pos 50 = toggle the Scroll layer
-                   (encoder -> scroll). Both were &none; move either in Studio. */
-                &studio_unlock  &tog 1    &none     &kp DOWN  &none     &none
+                /* Row 4 (positions 49-54): only DOWN (pos 52) is a real key.
+                   49,50,51,53,54 are unpopulated matrix slots - no physical
+                   switch exists there - so they MUST stay &none. */
+                &none     &none     &none     &kp DOWN  &none     &none
                 /* Row 5 (trackpad buttons) */
                 &mkp MB2  &mkp MB3  &mkp MB1  &none     &none     &none
             >;
