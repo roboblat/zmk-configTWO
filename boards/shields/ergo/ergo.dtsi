@@ -72,18 +72,21 @@
     };
 
     /*
-     * Encoder lives physically on the LEFT (peripheral) at gpio0 2/3.
-     * It is defined here in the shared .dtsi so the RIGHT (central) build
-     * also has an *enabled* EC11 node - without one, ZMK forces the EC11
-     * trigger thread off on the central and no encoder events are processed.
-     * On the right these pins (D0/D1) are otherwise unused.
+     * Encoder hardware lives physically on the LEFT (peripheral) at gpio0 2/3.
+     * Defined here (shared) so the `sensors` node below resolves on both
+     * builds, but DISABLED by default. The LEFT overlay enables it (status
+     * okay); the RIGHT (central) leaves it disabled. The central still gets
+     * rotation events over the split link via the shared `sensors` node.
+     * This mirrors the working pre-Studio setup; defining an *enabled* local
+     * encoder on the central made it bind to its own dead sensor instead of
+     * the relayed one, which is why rotation stopped working.
      */
     encoder0: encoder_0 {
         compatible = "alps,ec11";
         a-gpios = <&gpio0 2 (GPIO_ACTIVE_HIGH | GPIO_PULL_UP)>;
         b-gpios = <&gpio0 3 (GPIO_ACTIVE_HIGH | GPIO_PULL_UP)>;
         steps = <80>;
-        status = "okay";
+        status = "disabled";
     };
 
     sensors {
