@@ -17,6 +17,17 @@
     col-offset = <5>;
 };
 
+/*
+ * Auto "mouse layer": while the trackpad sends input, enable layer 4 (Mouse).
+ * excluded-positions = the 3 trackpad buttons, so clicking them does NOT drop
+ * the layer. require-prior-idle-ms stops the pad from grabbing the layer right
+ * after a keystroke (raise it if typing accidentally triggers mouse mode).
+ */
+&zip_temp_layer {
+    excluded-positions = <55 56 57>;
+    require-prior-idle-ms = <100>;
+};
+
 &i2c0 {
     mcp23008: mcp23008@20 {
         compatible = "microchip,mcp23008";
@@ -109,6 +120,7 @@
          * ZMK Studio - it's all firmware.)
          */
         input-processors =
+            <&zip_temp_layer 4 400>,
             <&trackpad_transform (INPUT_TRANSFORM_XY_SWAP | INPUT_TRANSFORM_X_INVERT)>,
             <&zip_xy_scaler 1 1>,
             <&trackpad_scroll_transform (INPUT_TRANSFORM_XY_SWAP | INPUT_TRANSFORM_Y_INVERT)>,
