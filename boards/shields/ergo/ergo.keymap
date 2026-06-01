@@ -41,19 +41,6 @@
             /* opposite (left) hand */
             hold-trigger-key-positions = <0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24>;
         };
-
-        /*
-         * Encoder -> mouse scroll wheel. Wraps the &msc (mouse scroll)
-         * behavior in a sensor-rotate so a turn emits scroll instead of a
-         * keypress. Used by the Scroll layer's sensor-bindings below.
-         * (Requires CONFIG_ZMK_POINTING=y, which is already set.)
-         */
-        enc_scroll: enc_scroll {
-            compatible = "zmk,behavior-sensor-rotate";
-            #sensor-binding-cells = <0>;
-            bindings = <&msc SCRL_UP>, <&msc SCRL_DOWN>;
-            tap-ms = <30>;
-        };
     };
 
     combos {
@@ -115,7 +102,6 @@
 
             /* Encoder = SCROLL on the base layer (your preference).
                Volume lives on the Fn layer below. */
-            sensor-bindings = <&enc_scroll>;
         };
 
         /*
@@ -155,7 +141,6 @@
             >;
 
             /* Encoder unchanged while held (scroll). */
-            sensor-bindings = <&enc_scroll>;
         };
 
         /*
