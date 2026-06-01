@@ -39,7 +39,7 @@
         one-finger-tap;              /* tap            -> left click  */
         two-finger-tap;              /* two-finger tap -> right click */
         press-and-hold;              /* hold + move    -> click & drag */
-        press-and-hold-time = <250>; /* +ms over tap time to engage drag */
+        press-and-hold-time = <100>; /* +ms over tap time to engage drag (lowered from 250 so it triggers more easily) */
         scroll;                      /* two-finger vertical + horizontal scroll */
         /* (This driver has no pinch/zoom, 3-finger, or swipe gestures.) */
 
@@ -100,18 +100,24 @@
         compatible = "zmk,input-listener";
         device = <&tps43>;
         /*
-         * Sensitivity = the scalers, given as <multiplier divisor>:
-         *   <&zip_xy_scaler 1 1>  -> 1.0x (no change, current feel)
-         *   <&zip_xy_scaler 3 2>  -> 1.5x faster cursor
-         *   <&zip_xy_scaler 1 2>  -> 0.5x slower cursor
-         * zip_scroll_scaler does the same for scroll speed. Edit the two
-         * numbers to taste, rebuild, reflash. (None of this is editable in
-         * ZMK Studio - it's all firmware.)
+         * DIRECTION: the transform flags below control axis mapping.
+         *   INPUT_TRANSFORM_XY_SWAP   = exchange X and Y (up<->right)
+         *   INPUT_TRANSFORM_X_INVERT  = flip left/right
+         *   INPUT_TRANSFORM_Y_INVERT  = flip up/down
+         * If a direction is still wrong after flashing, add or remove the
+         * relevant flag. e.g. cursor goes left when you swipe right -> toggle
+         * X_INVERT; scroll goes the wrong way -> toggle Y_INVERT. Combine with
+         * '|'. Removing XY_SWAP (done here) fixes the up<->right transposition.
+         *
+         * SENSITIVITY: the scalers are <multiplier divisor>:
+         *   <&zip_xy_scaler 1 1> = 1.0x   <&zip_xy_scaler 3 2> = 1.5x faster
+         *   <&zip_xy_scaler 1 2> = 0.5x slower. Same for zip_scroll_scaler.
+         * (None of this is editable in ZMK Studio - it's firmware.)
          */
         input-processors =
-            <&trackpad_transform (INPUT_TRANSFORM_XY_SWAP | INPUT_TRANSFORM_X_INVERT)>,
+            <&trackpad_transform (INPUT_TRANSFORM_X_INVERT)>,
             <&zip_xy_scaler 1 1>,
-            <&trackpad_scroll_transform (INPUT_TRANSFORM_XY_SWAP | INPUT_TRANSFORM_Y_INVERT)>,
+            <&trackpad_scroll_transform (INPUT_TRANSFORM_Y_INVERT)>,
             <&zip_scroll_scaler 1 1>;
     };
 };
