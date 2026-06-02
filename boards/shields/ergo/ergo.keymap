@@ -1,7 +1,11 @@
 #include <behaviors.dtsi>
 #include <dt-bindings/zmk/keys.h>
 #include <dt-bindings/zmk/bt.h>
-#include <dt-bindings/zmk/pointing.h> /* &mkp for the trackpad buttons */
+/* Raise scroll velocity BEFORE including pointing.h. The default (10) is often
+   too low for an encoder to register a wheel tick per detent - a known reason
+   encoder &msc scroll appears dead. Must be defined before the header. */
+#define ZMK_POINTING_DEFAULT_SCRL_VAL 80
+#include <dt-bindings/zmk/pointing.h> /* &mkp for the trackpad buttons; &msc scroll */
 
 / {
     behaviors {
@@ -111,7 +115,11 @@
                 &mkp MB2  &mkp MB3  &mkp MB1  &none     &none     &none
             >;
 
-            /* Encoder = SCROLL on the base layer (your preference). */
+            /* Encoder = SCROLL on base. Now uses the boosted scroll value above.
+               If wheel scroll STILL doesn't register (XIAO mouse-HID can be
+               flaky), swap this one line for reliable page-scroll:
+                 sensor-bindings = <&inc_dec_kp PG_UP PG_DN>;
+               which uses the same proven keycode path as the volume binding. */
             sensor-bindings = <&enc_scroll>;
         };
 
