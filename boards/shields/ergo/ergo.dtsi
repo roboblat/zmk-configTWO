@@ -72,13 +72,26 @@
     };
 
     /*
-     * Encoder is wired as TWO KEYS instead of a rotary sensor (the rotary/
-     * sensor path would not relay reliably from the peripheral). Pin A (D0 =
-     * gpio0 2) and pin B (D1 = gpio0 3) each become a key via a direct-GPIO
-     * kscan in the LEFT overlay, surfaced as two extra matrix positions that
-     * you map freely in ZMK Studio (e.g. one = Vol Up, the other = Vol Down).
-     * No sensors node anymore.
+     * Rotary encoder on the LEFT (peripheral) at gpio0 2/3 (D0/D1).
+     * Defined in this shared file so the central knows a sensor exists and
+     * routes sensor-bindings. Enabled here; the split relay carries left-half
+     * rotations to the central. The matching split fix is CONFIG_EC11 +
+     * trigger thread in ergo_left.conf (the peripheral's own config), which
+     * is what the ZMK split-encoder docs require.
      */
+    encoder0: encoder_0 {
+        compatible = "alps,ec11";
+        a-gpios = <&gpio0 2 (GPIO_ACTIVE_HIGH | GPIO_PULL_UP)>;
+        b-gpios = <&gpio0 3 (GPIO_ACTIVE_HIGH | GPIO_PULL_UP)>;
+        steps = <80>;
+        status = "okay";
+    };
+
+    sensors {
+        compatible = "zmk,keymap-sensors";
+        sensors = <&encoder0>;
+        triggers-per-rotation = <20>;
+    };
 };
 
 /*
